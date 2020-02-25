@@ -1,0 +1,648 @@
+package  
+{
+	import flash.display.MovieClip;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
+	import flash.display.SimpleButton;
+	import flash.events.MouseEvent;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
+	import flash.display.Sprite;
+	import flashx.textLayout.utils.CharacterUtil;
+	import flash.sampler.Sample;
+	import flash.events.KeyboardEvent;
+	import flash.display.Sprite;
+    import flash.text.TextField;
+    import flash.text.TextFieldType;
+	//import flash.Math.random;
+	
+
+	public class Snake extends MovieClip
+	{
+		var arrSnake:Array;
+		var esc:Array;
+		var tam:int = 10;
+		var gusan:Array;
+		var arrL1:Array = new Array();
+		var arrL2:Array = new Array();
+		var divL1:int = 600/tam;
+		var contL1:int = 0;
+		var contGus:int=0;
+		var vTiempo: Timer = new Timer(500,1);
+		var direccion: String="derecha";
+		var sentido: String="+";
+		var casilla:int = tam/2;
+		var posi:int = casilla*600;
+		//var arrRan:Array = new Array();
+		var comRan:Boolean = false;
+		var puntuacion:int=0;
+		var fruta:Sprite;
+		var textoP: TextField=new TextField();
+		var forT:TextFormat = new TextFormat();
+		var botonRe: SimpleButton;
+		
+		
+		
+		public function Snake() 
+		{
+			//trace("inicio");
+			Escenario();
+			Lineas();
+			vTiempo.addEventListener(TimerEvent.TIMER_COMPLETE, movimiento);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyPressedDown);
+			vTiempo.start();
+			
+		}
+		public function Escenario()
+		{
+			esc = new Array();
+			trace("ESCENARIO");
+			for(var i=0; i<tam; i++)
+			{
+				esc.push(new Array());
+				for(var j=0; j<tam; j++)
+				{
+					esc[i].push(0);
+				}
+			}
+			
+			trace(esc.length, esc[esc.length-1].length);
+			//esc[casilla-1][casilla-1]=1;
+			//esc[casilla-1][casilla-2]=1;
+			//esc[casilla-1][casilla-3]=1;
+			//trace(esc);
+			
+			//trace (esc[casilla-1][casilla-1]);
+			//trace(esc[casilla-1][casilla-2]);
+			//trace (esc[casilla-1][casilla-3]);
+		}
+		
+		public function movimiento(event: TimerEvent)
+		{
+			trace(esc);
+			trace("movimiento");
+			var cont_mov:int = 0;
+			//var aux_movi:String="";
+			var movi_prox:String="";
+			for each(var movi: Array in arrSnake)
+			{
+				if(cont_mov>0)
+				{
+					movi[4]=movi_prox;
+				}
+
+				if(movi[3]=="derecha")
+				{
+					if(movi[1] == esc[0].length-1)  	//si 
+					{
+						trace("reinicio");
+						trace(movi);
+						movi[0].x = 0;
+						esc[movi[2]][movi[1]]=0;
+						movi[1]=0;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						esc[movi[2]][movi[1]]=1;
+					}
+					else
+					{
+						movi[0].x+=divL1;
+						trace(movi);
+						esc[movi[2]][movi[1]]=0;
+						movi[1]+=1;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						//movDer[2];
+						esc[movi[2]][movi[1]]=1;
+					}
+				}
+				else if(movi[3]=="izquierda")
+				{
+					if(movi[1] == 0)
+					{
+						trace("reinicio");
+						trace(movi);
+						movi[0].x = 600-divL1;
+						esc[movi[2]][movi[1]]=0;
+						movi[1]=esc[0].length-1;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						esc[movi[2]][movi[1]]=1;
+					}
+					else
+					{
+						movi[0].x-=divL1;
+						trace(movi);
+						esc[movi[2]][movi[1]]=0;
+						movi[1]-=1;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						//movDer[2];
+						esc[movi[2]][movi[1]]=1;
+					}
+				}
+				else if(movi[3]=="abajo")
+				{
+					if(movi[2] == esc[0].length-1)
+					{
+						trace("reinicio");
+						trace(movi);
+						movi[0].y = 0;
+						esc[movi[2]][movi[1]]=0;
+						movi[2]=0;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						esc[movi[2]][movi[1]]=1;
+						
+					}
+					else
+					{
+						movi[0].y+=divL1;
+						trace(movi);
+						esc[movi[2]][movi[1]]=0;
+						movi[2]+=1;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						//movDer[2];
+						esc[movi[2]][movi[1]]=1;
+					}
+				}
+				else if(movi[3]=="arriba")
+				{
+					if(movi[2] == 0)
+					{
+						trace("reinicio");
+						trace(movi);
+						movi[0].y = 600-divL1;
+						esc[movi[2]][movi[1]]=0;
+						movi[2]=esc.length-1;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						esc[movi[2]][movi[1]]=1;
+						
+					}
+					else
+					{
+						movi[0].y-=divL1;
+						trace(movi);
+						esc[movi[2]][movi[1]]=0;
+						movi[2]-=1;
+						if(esc[movi[2]][movi[1]]==1)
+						{
+							Lose();
+							return 0;
+						}
+						if(esc[movi[2]][movi[1]]==10)
+						{
+							trace("Eliminar fruta");
+							eliTextoP();
+							textoPun();
+							crecer();
+							eliFruta();
+							rellFruta();
+						}
+						//movDer[2];
+						esc[movi[2]][movi[1]]=1;
+					}
+				}
+				//aux_movi=movi[3];
+				if(cont_mov==0)
+				{
+					movi[5].x=movi[0].x+10;
+					movi[5].y=movi[0].y+10;
+				}
+				cont_mov++;
+				movi_prox = movi[3];
+				movi[3] = movi[4];
+			}
+			vTiempo.start();
+		}
+		
+		public function Lineas()
+		{
+			//trace("dibuja lineas")
+			
+			for (var hor=50+divL1; hor<650; hor = hor + divL1)
+			{
+				//trace("linea",cont);
+				arrL1[contL1] = new Sprite();
+				arrL1[contL1].graphics.lineStyle(1, 0x000100);
+				arrL1[contL1].graphics.moveTo(hor, 650);
+				arrL1[contL1].graphics.lineTo(hor, 50);
+				addChild(arrL1[contL1]);
+				contL1++;
+			}
+			var divL2 = 600/tam;
+			var contL2:int = 0;
+			for (hor=50+divL1; hor<650; hor = hor + divL1)
+			{
+				//trace("linea",cont);
+				arrL2[contL2] = new Sprite();
+				arrL2[contL2].graphics.lineStyle(1, 0x000100);
+				arrL2[contL2].graphics.moveTo(650, hor);
+				arrL2[contL2].graphics.lineTo(50, hor);
+				addChild(arrL2[contL2]);
+				contL2++;
+				
+			}
+			Gusanito();
+		}
+//----------------------------------------------------------------------------------------------------------------
+		public function Gusanito()
+		{
+			arrSnake = new Array();
+			gusan = new Array();
+			var contGus:int=0;
+			trace("gusa");
+			var cabe:Sprite = new Sprite();
+			cabe.graphics.beginFill(0x001111);
+			cabe.graphics.lineStyle(1, 0x000100);
+			//cabe.graphics.drawRect((casilla*divL1+50),(casilla*divL1+50),(divL1),(divL1));
+			//cabe.graphics.drawRect((casilla*divL1+50),(casilla*divL1+50),(divL1),(divL1));
+			cabe.graphics.drawRect((50),(50),(divL1),(divL1));
+			addChild(cabe);
+			cabe.x=((casilla*divL1));
+			cabe.y=((casilla*divL1));
+			
+			
+			//trace("ojos");
+			var ojo1:Sprite =new Sprite();
+			ojo1.graphics.beginFill(0xe8e5da);
+			ojo1.graphics.lineStyle(1, 0xe8e5da);
+			//ojo1.graphics.drawCircle((casilla*divL1+60),(casilla*divL1+57), 3);
+			//ojo1.graphics.drawCircle((casilla*divL1+60),(casilla*divL1+57), 5);
+			ojo1.graphics.drawCircle((50),(50), 5);
+			addChild(ojo1);
+			ojo1.x=(casilla*divL1+10);
+			ojo1.y=(casilla*divL1+7);
+			
+			contGus++;
+			var cuer: Sprite = new Sprite();
+			cuer.graphics.beginFill(0x001111);
+			cuer.graphics.lineStyle(1, 0x001111);
+			//cuer.graphics.drawRect((casilla*divL1+50-(contGus*divL1)),(casilla*divL1+50),(divL1),(divL1));
+			//cuer.graphics.drawRect((casilla*divL1+50-(divL1)),(casilla*divL1+50),(divL1),(divL1));
+			cuer.graphics.drawRect((50),(50), divL1, divL1);
+			addChild(cuer);
+			cuer.x=(casilla*divL1-(divL1));
+			cuer.y=(casilla*divL1);
+		
+			contGus++;
+			var cola:Sprite = new Sprite();
+			cola.graphics.beginFill(0x001111);
+			cola.graphics.lineStyle(1, 0x001111);
+			//cola.graphics.drawRect((casilla*divL1+50-(contGus*divL1)),(casilla*divL1+50),(divL1),(divL1));
+			//cola.graphics.drawRect((casilla*divL1+50-(2*divL1)),(casilla*divL1+50),(divL1),(divL1));
+			cola.graphics.drawRect((50),(50),divL1, divL1);
+			addChild(cola);
+			cola.x=(casilla*divL1-(2*divL1))
+			cola.y=(casilla*divL1)
+			
+			
+			//asignar valores de cabeza a un arreglo(sprite, x, y)
+			arrSnake.push(new Array());
+			arrSnake[0].push(cabe);
+			arrSnake[0].push(casilla);
+			arrSnake[0].push(casilla);
+			arrSnake[0].push("derecha");
+			arrSnake[0].push("derecha");
+			arrSnake[0].push(ojo1);
+			trace(arrSnake[0]);
+			
+			/*//asignar valores de ojo1 a un arreglo(sprite, x, y)
+			arrSnake.push(new Array());
+			arrSnake[1].push(ojo1); 		//sprite
+			arrSnake[1].push(casilla);		//coordenadas x
+			arrSnake[1].push(casilla);		//coordenadas y
+			arrSnake[1].push("derecha");	//movimiento actual
+			arrSnake[1].push("derecha");	//movimiento futuro
+			trace(arrSnake[1]);
+			*/
+			//asignar valores de cuerpo a un arreglo(sprite, x, y)
+			arrSnake.push(new Array());
+			arrSnake[1].push(cuer);
+			arrSnake[1].push(casilla-1);
+			arrSnake[1].push(casilla);
+			arrSnake[1].push("derecha");
+			arrSnake[1].push("derecha");
+			trace(arrSnake[1]);
+			
+			//asignar valores de cola a un arreglo(sprite, x, y)
+			arrSnake.push(new Array());
+			arrSnake[2].push(cola);
+			arrSnake[2].push(casilla-2);
+			arrSnake[2].push(casilla);
+			arrSnake[2].push("derecha");
+			arrSnake[2].push("derecha");
+			trace(arrSnake[2]);
+			
+			rellFruta();//generar posicion de la fruta
+			textoPun();
+			
+			
+		}
+		function keyPressedDown(event:KeyboardEvent) 
+		{
+			trace("tecla precionada")
+			if (event.keyCode == 37) //izquierda
+			{
+				if(arrSnake[0][4]!="derecha")
+				{
+					arrSnake[0][4]="izquierda";
+					trace(direccion);
+					trace(sentido);
+				}
+			}
+			else if (event.keyCode == 39) //derecha
+			{
+				if(arrSnake[0][4]!="izquierda")
+				{
+					arrSnake[0][4]="derecha";
+					trace(direccion);
+					trace(sentido);
+				}
+			}
+			else if (event.keyCode == 38)//arriba
+			{
+				if(arrSnake[0][4]!="abajo")
+				{
+					arrSnake[0][4]="arriba";
+					trace(direccion);
+					trace(sentido);
+				}
+			}
+			else if (event.keyCode == 40)//abajo
+			{
+				if(arrSnake[0][4]!="arriba")
+				{
+					arrSnake[0][4]="abajo";
+					trace(direccion);
+					trace(sentido);
+				}
+			}
+		}
+		public function numRan()
+		{
+			var numAle:int=0;
+			var numAle2:int=0;
+			var arrRan:Array = new Array();
+			while(comRan==false)
+			{
+				numAle = Math.floor(Math.random() * ((tam-1) - 0)) + 0;
+				trace(numAle);
+				numAle2= Math.floor(Math.random() * ((tam-1) - 0)) + 0;
+				trace(numAle2);
+				if(esc[numAle][numAle2]==0)
+				{
+					comRan==true;
+					arrRan.push(numAle);
+					arrRan.push(numAle2);
+					esc[numAle2][numAle]=10;
+					return arrRan;
+				}
+			}
+			
+		}
+		public function rellFruta()
+		{
+			fruta=new Sprite();
+			var arrRell : Array =numRan();
+			fruta.graphics.beginFill(0xdc2d22);
+			fruta.graphics.lineStyle(1, 000100 );
+			//cabe.graphics.drawRect((casilla*divL1+50),(casilla*divL1+50),(divL1),(divL1));
+			//cabe.graphics.drawRect((casilla*divL1+50),(casilla*divL1+50),(divL1),(divL1));
+			fruta.graphics.drawRect((50),(50),(divL1),(divL1));
+			addChild(fruta);
+			fruta.x=((arrRell[0]*divL1));
+			fruta.y=((arrRell[1]*divL1));
+		}
+		public function eliFruta()
+		{
+			removeChild(fruta);
+			fruta=null;
+			puntuacion+=100;
+			trace(puntuacion);
+		}
+		public function textoPun()
+		{
+            
+            forT.bold = true;
+			forT.align = "left";
+			forT.size=40;
+			forT.color=0x008f39;
+			forT.font="Arial";
+			
+			textoP.x=700;
+			textoP.y=100;
+			textoP.width=480;
+			textoP.height=480;
+			textoP.text="Puntuacion: "+puntuacion;
+			textoP.setTextFormat(forT);
+			addChild(textoP);
+        }
+		public function eliTextoP()
+		{
+			removeChild(textoP);
+		}
+		public function crecer()
+		{
+			if(arrSnake[arrSnake.length-1][4]=="derecha")
+			{
+				arrSnake.push(new Array());
+				arrSnake[arrSnake.length-1].push(new Sprite);
+				arrSnake[arrSnake.length-1][0].graphics.beginFill(0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.lineStyle(1, 0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.drawRect((50),(50),divL1, divL1);
+				addChild(arrSnake[arrSnake.length-1][0]);
+				arrSnake[arrSnake.length-1][0].x=((arrSnake[arrSnake.length-2][0].x-divL1));
+				arrSnake[arrSnake.length-1][0].y=((arrSnake[arrSnake.length-2][0].y));
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][1]-1);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][2]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][3]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][4]);
+				//esc[arrSnake.length-1[2]][arrSnake.length-1[1]]=1;
+			}
+			else if(arrSnake[arrSnake.length-1][4]=="izquierda")
+			{
+				arrSnake.push(new Array());
+				arrSnake[arrSnake.length-1].push(new Sprite);
+				arrSnake[arrSnake.length-1][0].graphics.beginFill(0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.lineStyle(1, 0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.drawRect((50),(50),divL1, divL1);
+				addChild(arrSnake[arrSnake.length-1][0]);
+				arrSnake[arrSnake.length-1][0].x=((arrSnake[arrSnake.length-2][0].x+divL1));
+				arrSnake[arrSnake.length-1][0].y=((arrSnake[arrSnake.length-2][0].y));
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][1]+1);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][2]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][3]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][4]);
+				//esc[arrSnake.length-1[2]][arrSnake.length-1[1]]=1;
+			}
+			else if(arrSnake[arrSnake.length-1][4]=="abajo")
+			{
+				arrSnake.push(new Array());
+				arrSnake[arrSnake.length-1].push(new Sprite);
+				arrSnake[arrSnake.length-1][0].graphics.beginFill(0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.lineStyle(1, 0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.drawRect((50),(50),divL1, divL1);
+				addChild(arrSnake[arrSnake.length-1][0]);
+				arrSnake[arrSnake.length-1][0].x=((arrSnake[arrSnake.length-2][0].x));
+				arrSnake[arrSnake.length-1][0].y=((arrSnake[arrSnake.length-2][0].y-divL1));
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][1]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][2]-1);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][3]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][4]);
+				//esc[arrSnake.length-1[2]][arrSnake.length-1[1]]=1;
+			}
+			else if(arrSnake[arrSnake.length-1][4]=="arriba")
+			{
+				arrSnake.push(new Array());
+				arrSnake[arrSnake.length-1].push(new Sprite);
+				arrSnake[arrSnake.length-1][0].graphics.beginFill(0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.lineStyle(1, 0x001111);
+				arrSnake[arrSnake.length-1][0].graphics.drawRect((50),(50),divL1, divL1);
+				addChild(arrSnake[arrSnake.length-1][0]);
+				arrSnake[arrSnake.length-1][0].x=((arrSnake[arrSnake.length-2][0].x));
+				arrSnake[arrSnake.length-1][0].y=((arrSnake[arrSnake.length-2][0].y+divL1));
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][1]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][2]+1);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][3]);
+				arrSnake[arrSnake.length-1].push(arrSnake[arrSnake.length-2][4]);
+				//esc[arrSnake.length-1[2]][arrSnake.length-1[1]]=1;
+			}
+		}
+		public function Lose()
+		{
+			trace("DERROTA");
+			forT.bold = true;
+			forT.align = "left";
+			forT.size=40;
+			forT.color=0xff0303;
+			forT.font="Arial";
+			
+			textoP.x=700;
+			textoP.y=500;
+			textoP.width=480;
+			textoP.height=480;
+			textoP.text="¡Fin del juego!\n Puntuacion Final: "+puntuacion;
+			textoP.setTextFormat(forT);
+			addChild(textoP);
+			Reinicio();
+		}
+		public function Reinicio()
+		{
+			botonRe= new reset();
+			botonRe.x=700;
+			botonRe.y=300;
+			botonRe.height=250;
+			botonRe.width=400;
+			addChild(botonRe);
+			botonRe.addEventListener(MouseEvent.CLICK, rein);
+		}
+		public function rein(event: MouseEvent)
+		{
+			puntuacion=0;
+			esc=null;
+			removeChild(botonRe);
+			Escenario();
+			for each(var movi: Array in arrSnake)
+			{
+				removeChild(movi[0]);
+			}
+			removeChild(arrSnake[0][5]);
+			removeChild(fruta);
+			arrSnake=null;
+			fruta=null;
+			Gusanito();
+			vTiempo.addEventListener(TimerEvent.TIMER_COMPLETE, movimiento);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyPressedDown);
+			
+			vTiempo.start();
+			
+		}
+	}
+}
